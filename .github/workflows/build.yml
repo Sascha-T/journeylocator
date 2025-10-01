@@ -31,8 +31,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: NeoForge
-          path: neoforge/build/libs/*-out.jar
+          path: neoforge/build/libs/*.jar
       - uses: actions/upload-artifact@v4
         with:
           name: Fabric
-          path: fabric/build/libs/*-out.jar
+          path: fabric/build/libs/*.jar
