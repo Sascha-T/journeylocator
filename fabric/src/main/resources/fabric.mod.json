@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "journeylocator",
+  "version": "${version}",
+  "name": "JourneyLocator",
+  "description": "",
+  "authors": [
+    ""
+  ],
+  "contact": {
+    "homepage": ""
+  },
+  "license": "unlicense",
+  "icon": "assets/journeylocator/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "de.saschat.journeylocator.fabric.JourneylocatorFabric"
+    ],
+    "client": [
+      "de.saschat.journeylocator.fabric.client.JourneylocatorFabricClient"
+    ]
+  },
+  "mixins": [
+    "journeylocator.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.17.2",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*",
+    "journeymap": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

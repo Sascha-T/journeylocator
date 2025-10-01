@@ -1,0 +1,40 @@
+modLoader = "javafml"
+loaderVersion = "[2,)"
+#issueTrackerURL = ""
+license = "Unlicense"
+
+[[mods]]
+modId = "journeylocator"
+version = "${version}"
+displayName = "JourneyLocator"
+authors = ""
+description = '''
+
+'''
+displayTest = "NONE"
+#logoFile = ""
+
+[[dependencies.journeylocator]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.journeylocator]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.journeylocator]]
+modId = "journeymap"
+type = "required"
+versionRange = "[*,)"
+ordering = "NONE"
+side = "BOTH"
+
+
+[[mixins]]
+config = "journeylocator.mixins.json"
