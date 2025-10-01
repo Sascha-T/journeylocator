@@ -24,18 +24,16 @@ public enum XaeroTypes {
     public static void write(XaeroSubpacket packet, FriendlyByteBuf buf) {
         for (XaeroTypes value : values()) {
             if(value.clz == packet.getClass()) {
-                buf.writeInt(value.id);
+                buf.writeByte((byte) value.id);
                 value.write.accept(packet, buf);
             }
         }
     }
     public static XaeroSubpacket read(FriendlyByteBuf buf) {
         byte id = buf.readByte();
-        System.out.println("NOW READING XAERO PACKET: " + id);
         for (XaeroTypes value : values()) {
             if(value.id == id) {
                 var x = value.read.apply(buf);
-                System.out.println("RECEIVED: " + x.toString());
                 return x;
             }
         }

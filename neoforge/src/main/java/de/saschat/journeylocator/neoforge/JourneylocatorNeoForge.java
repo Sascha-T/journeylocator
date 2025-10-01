@@ -6,6 +6,11 @@ import de.saschat.journeylocator.network.XaeroCodec;
 import de.saschat.journeylocator.network.packets.XaeroMinimapPacket;
 import de.saschat.journeylocator.network.packets.XaeroWorldmapPacket;
 import de.saschat.journeylocator.network.subpackets.XaeroSubpacket;
+import de.saschat.journeylocator.registry.ModEffects;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -17,6 +22,13 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.registries.ModifyRegistriesEvent;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
+import net.neoforged.neoforge.registries.callback.AddCallback;
+
+import java.util.Map;
 
 @Mod(JourneyLocator.MOD_ID)
 public final class JourneylocatorNeoForge {
@@ -25,6 +37,7 @@ public final class JourneylocatorNeoForge {
         JourneyLocator.init();
 
         bus.addListener(this::network);
+        bus.addListener(this::registry);
         NeoForge.EVENT_BUS.addListener(this::join);
         NeoForge.EVENT_BUS.addListener(this::level);
         NeoForge.EVENT_BUS.addListener(this::entity);
@@ -45,10 +58,10 @@ public final class JourneylocatorNeoForge {
         }
     }
     private void level(PlayerEvent.PlayerChangedDimensionEvent event) {
-        JourneyLocator.reset();
+        JourneyLocator.changeLevel(event.getTo());
     }
     private void join(ClientPlayerNetworkEvent.LoggingOut event) {
-        JourneyLocator.setState(true);
+        JourneyLocator.reset();
     }
     private void network(RegisterPayloadHandlersEvent event) {
 
@@ -61,5 +74,13 @@ public final class JourneylocatorNeoForge {
     }
     private void handlerMm(XaeroMinimapPacket xaerosPacket, IPayloadContext iPayloadContext) {
         JourneyLocator.packet(SourceDistinction.MINIMAP, xaerosPacket.packet);
+
+    }
+    private void registry(RegisterEvent event) {
+        event.register(Registries.MOB_EFFECT, (h) -> {
+            for (Map.Entry<ResourceLocation, MobEffect> x : ModEffects.effects.entrySet()) {
+                h.register(x.getKey(), x.getValue());
+            }
+        });
     }
 }

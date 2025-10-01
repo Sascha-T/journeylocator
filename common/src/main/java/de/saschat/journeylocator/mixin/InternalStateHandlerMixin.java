@@ -2,6 +2,8 @@ package de.saschat.journeylocator.mixin;
 
 import de.saschat.journeylocator.JourneyLocator;
 import journeymap.client.InternalStateHandler;
+import journeymap.client.model.entity.EntityHelper;
+import journeymap.client.render.ingame.WaypointDecorationRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

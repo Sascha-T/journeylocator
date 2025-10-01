@@ -1,25 +1,29 @@
 package de.saschat.journeylocator.fabric;
 
 import de.saschat.journeylocator.JourneyLocator;
-import de.saschat.journeylocator.TrackedPlayerContainer;
 import de.saschat.journeylocator.network.SourceDistinction;
 import de.saschat.journeylocator.network.XaeroCodec;
 import de.saschat.journeylocator.network.packets.XaeroMinimapPacket;
 import de.saschat.journeylocator.network.packets.XaeroWorldmapPacket;
 import de.saschat.journeylocator.network.subpackets.XaeroSubpacket;
+import de.saschat.journeylocator.registry.ModEffects;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+
+import java.util.Map;
 
 public final class JourneylocatorFabric implements ModInitializer {
     @Override
@@ -39,6 +43,10 @@ public final class JourneylocatorFabric implements ModInitializer {
         ClientPlayConnectionEvents.DISCONNECT.register(this::reset);
         ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register(this::worldChange);
         ClientEntityEvents.ENTITY_LOAD.register(this::load);
+
+        for (Map.Entry<ResourceLocation, MobEffect> e : ModEffects.effects.entrySet()) {
+            Registry.register(BuiltInRegistries.MOB_EFFECT, e.getKey(), e.getValue());
+        }
     }
 
     private void load(Entity entity, ClientLevel clientLevel) {

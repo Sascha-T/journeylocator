@@ -15,7 +15,6 @@ public class TrackedPlayerContainer {
     private static Map<UUID, Integer> ID_CACHE = new HashMap<>();
 
     public static void receiveTracking(UUID player, Position pos) {
-        System.out.println("x " + pos.pos.x + ", y " + pos.pos.y + ", z " + pos.pos.z + ", key " + pos.dimension.toString());
         PLAYERS.put(player, pos);
     }
     public static void removeTracking(UUID player) {

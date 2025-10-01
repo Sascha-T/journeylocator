@@ -8,6 +8,7 @@ public record ClientboundTrackerResetPacket() implements XaeroSubpacket {
     }
 
     public void write(FriendlyByteBuf buf) {
+        throw new AssertionError("Not required");
     }
 
     @Override

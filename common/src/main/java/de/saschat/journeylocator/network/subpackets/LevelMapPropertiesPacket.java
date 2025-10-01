@@ -8,7 +8,7 @@ public record LevelMapPropertiesPacket(int id) implements XaeroSubpacket {
     }
 
     public void write(FriendlyByteBuf buf) {
-        buf.writeInt(id);
+        throw new AssertionError("Not required");
     }
 
     @Override

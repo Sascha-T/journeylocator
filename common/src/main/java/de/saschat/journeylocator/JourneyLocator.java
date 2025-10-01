@@ -9,12 +9,12 @@ import journeymap.client.JourneymapClient;
 import journeymap.client.data.DataCache;
 import journeymap.common.network.model.PlayerLocation;
 import journeymap.common.util.PlayerRadarManager;
+import journeymap.common.waypoint.WaypointStore;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.system.macosx.EnumerationMutationHandlerI;
 
 import java.util.Map;
 import java.util.UUID;
@@ -24,12 +24,14 @@ public final class JourneyLocator {
     public static final String MOD_ID = "journeylocator";
     public static final ResourceLocation XAERO_PACKETS = ResourceLocation.parse("xaerominimap:main");
     public static BiConsumer<SourceDistinction, XaeroSubpacket> SUBPACKET_CONSUMER;
+    private static void sendPacket(SourceDistinction to, XaeroSubpacket packet) {
+        log.info("Sending {} to {}", packet.getClass().toString(), to.name());
+        SUBPACKET_CONSUMER.accept(to, packet);
+    }
     private static final Logger log = LogManager.getLogger();
 
     public static void init() {
     }
-    private static SourceDistinction preferredSource = null;
-
 
     private static void jm_remove(UUID uuid) {
         PlayerRadarManager.getInstance().remove(uuid);
@@ -40,17 +42,14 @@ public final class JourneyLocator {
     }
 
     public static void packet(SourceDistinction ps, XaeroSubpacket x) {
+        if(x.getClass() != ClientboundTrackedPlayerPacket.class)
+            log.info("Received {} from {}", x.getClass().getSimpleName(), ps.name());
         switch (x) {
             case HandshakePacket hp -> {
-                SUBPACKET_CONSUMER.accept(ps, hp);
+                sendPacket(ps, hp);
             }
             case ClientboundTrackedPlayerPacket tp -> {
                 if(!ENABLED) return;
-
-                if(preferredSource == null) {
-                    preferredSource = ps;
-                }
-                if(ps != preferredSource) return;
 
                 if(tp.remove()) {
                     jm_remove(tp.id());
@@ -63,11 +62,6 @@ public final class JourneyLocator {
             }
             case ClientboundTrackerResetPacket tr -> {
                 if(!ENABLED) return;
-
-                if(preferredSource == null) {
-                    preferredSource = ps;
-                }
-                if(ps != preferredSource) return;
 
                 for (UUID key : TrackedPlayerContainer.getKeys()) { // ik its not sent during usage
                     jm_remove(key);
@@ -82,13 +76,15 @@ public final class JourneyLocator {
     }
 
     public static void reportPlayer(UUID uuid, int id) {
+        /*log.info("Entity id {} associated with {}", id, uuid.toString());
         if(!TrackedPlayerContainer.hasId(id)) {
             TrackedPlayerContainer.appendId(id, uuid);
+
             jm_remove(uuid);
             PlayerLocation loc = TrackedPlayerContainer.get(uuid);
             if(loc != null)
                 jm_update(loc);
-        }
+        }*/
     }
 
     private static boolean ENABLED = true;
@@ -96,9 +92,11 @@ public final class JourneyLocator {
 
     // reset on logout
     public static void setState(boolean b) {
+        log.info("Mod set to state: {}", b);
         ENABLED = b;
     }
     public static void reset() {
+        log.info("Resetting mod state");
         setState(true);
         level = null;
     }
@@ -108,6 +106,13 @@ public final class JourneyLocator {
 
         ResourceKey<Level> old = level;
         level = to;
+
+        String tmp = "";
+        if(old != null) {
+            tmp = " from " + old.location().toString();
+        }
+
+        log.info("Changing level{} to {}", tmp, to.location().toString());
 
         if(old != null && !old.equals(to)) { // if not new state, and dimension changes, reprocess players
             for (Map.Entry<UUID, TrackedPlayerContainer.Position> p : TrackedPlayerContainer.getPlayers().entrySet()) {
@@ -119,5 +124,9 @@ public final class JourneyLocator {
                 }
             }
         }
+    }
+
+    public static boolean getState() {
+        return ENABLED;
     }
 }
